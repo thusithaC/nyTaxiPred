@@ -1,0 +1,39 @@
+# how co compile?
+
+# this to compile 
+sbt compile
+
+#this to convert everything to an assembly jar that can be handed over to spark - it might take some time
+sbt assembly 
+
+
+$SPARK_HOME/bin/spark-submit \
+  --class tnc.spark.ml.nytaxi.data.processMain \
+  --master local[6] \
+  --driver-memory 42g \
+  /home/thusitha/work/spark/nytaxi/target/scala-2.11/NyTaxiFare-assembly-1.0.jar \
+  1000
+
+
+
+$SPARK_HOME/bin/spark-submit \
+  --class tnc.spark.ml.nytaxi.data.processMain \
+  --master spark://vmhost:6066 \
+  --deploy-mode cluster \
+  hdfs://vmhost:54310/jars/NyTaxiFare-assembly-1.0.jar \
+  1000
+
+
+
+$HADOOP_HOME/sbin/start-dfs.sh
+
+hdfs dfs -rm /jars/NyTaxiFare-assembly-1.0.jar
+hdfs dfs -copyFromLocal /home/thusitha/work/spark/nytaxi/target/scala-2.11/NyTaxiFare-assembly-1.0.jar  /jars/NyTaxiFare-assembly-1.0.jar
+
+$SPARK_HOME/sbin/stop-master.sh
+$SPARK_HOME/sbin/start-master.sh -h vmhost # on host
+
+
+$SPARK_HOME/sbin/stop-slave.sh
+$SPARK_HOME/sbin/start-slave.sh spark://vmhost:7077 #on slave
+
