@@ -26,9 +26,6 @@ scalaSource in Compile := baseDirectory.value / "src"
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "2.3.0",
   "org.apache.spark" %% "spark-sql" % "2.3.0",
-  "de.semkath" %% "symspell" % "0.1",
-  "org.mongodb.scala" %% "mongo-scala-driver" % "2.4.0",
-  "org.deeplearning4j" %% "scalnet" % "1.0.0-beta2",
   "ml.dmlc" % "xgboost4j" % "0.80-SNAPSHOT",
   "ml.dmlc" % "xgboost4j-spark" % "0.80-SNAPSHOT",
   "Azure" % "mmlspark" % "0.14",

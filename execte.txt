@@ -12,7 +12,8 @@ $SPARK_HOME/bin/spark-submit \
   --master local[6] \
   --driver-memory 42g \
   /home/thusitha/work/spark/nytaxi/target/scala-2.11/NyTaxiFare-assembly-1.0.jar \
-  1000
+  /home/thusitha/work/bigdata/datasets/nytaxi/\
+  0.1
 
 
 

@@ -4,16 +4,12 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 import org.apache.spark.ml.feature.VectorAssembler
-import ml.dmlc.xgboost4j.scala.spark.{XGBoostClassifier, XGBoostRegressor}
-import org.apache.spark.ml.tuning.CrossValidator
 
 
-class Preprocess(implicit spark:SparkSession) {
+class Preprocess(basePath:String, sampleSize:Double)(implicit spark:SparkSession) {
 
   import spark.implicits._
 
-  val basePath = "/home/thusitha/work/bigdata/datasets/nytaxi/"
-  //val basePath = "hdfs://vmhost:54310/nytaxi/"
   val trainDataPath = basePath + "train.csv"
   val testDataPath = basePath + "test.csv"
 
@@ -41,7 +37,7 @@ class Preprocess(implicit spark:SparkSession) {
     .schema(dataSchemaTrain)
     .option("header", "true")
     .load(trainDataPath)
-    .sample(0.4)
+    .sample(sampleSize)
     .na.drop()
 
   val rawTestData = spark.read.format("com.databricks.spark.csv")
@@ -103,46 +99,41 @@ class Preprocess(implicit spark:SparkSession) {
     setInputCols(trainColumns).
     setOutputCol("features")
 
-  /*
-  val xgbTrainInput = vectorAssembler.transform(trainDataEngineered).select("features", "fare_amount")
-
-
-  val xgbParam = Map("eta" -> 0.1f,
-    "max_depth" -> 10,
-    "objective" -> "reg:linear",
-    "num_round" -> 1000,
-    "num_workers" -> 8)
-
-  val xgbRegressor = new XGBoostRegressor(xgbParam)
-    .setFeaturesCol("features")
-    .setLabelCol("fare_amount")
-
-  val xgbREgressionModel = xgbRegressor.fit(xgbTrainInput)
-
-*/
-
 }
 
 object processMain extends App {
+
+  val defaultBasePath = "/home/thusitha/work/bigdata/datasets/nytaxi/"
+  //val defaultBasePath = "hdfs://vmhost:54310/nytaxi/"
+
+  val defaultSample = 0.1
+
+  val defaultLgbmPartitions = 16
+
+  if (args.length == 0) {
+    println("Using default parameters for data location and sub-sampling for training")
+  }
+
+  val dataLoc =  if (args.length == 1) args(0) else defaultBasePath
+  val sampleSize = if (args.length == 2) args(1).toDouble else defaultSample
+  val lgbmPartitions = if (args.length == 3) args(2).toInt else defaultLgbmPartitions
+
+
   implicit val spark:SparkSession = SparkSession
     .builder()
     .appName("NyTaxiFair")
-    .master("local[7]")
     .getOrCreate()
 
   /*    //.master("local[7]")
-    //.config("spark.driver.memory", "24G")
+        //.config("spark.driver.memory", "24G")
   * */
 
-  val preprocess = new Preprocess
+  val preprocess = new Preprocess(dataLoc,sampleSize)
   preprocess.trainDataEngineered.show(100)
 
-  val gbRunner = new LightGbmRunner(preprocess.trainDataEngineered, preprocess.trainColumns, preprocess.targetCol)
-  //val model = gbRunner.cvModel
+  val gbRunner = new LightGbmRunner(preprocess.trainDataEngineered, preprocess.trainColumns, preprocess.targetCol, lgbmPartitions)
   println("testing score " + gbRunner.metric)
   //println(gbRunner.bestParams)
 
 }
 
-/*
-* */

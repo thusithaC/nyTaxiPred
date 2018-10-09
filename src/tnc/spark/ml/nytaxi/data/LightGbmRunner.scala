@@ -7,7 +7,7 @@ import org.apache.spark.ml.param.Param
 import org.apache.spark.sql.DataFrame
 
 
-class LightGbmRunner(data: DataFrame, featureCols: Array[String], targetCol:String) {
+class LightGbmRunner(data: DataFrame, featureCols: Array[String], targetCol:String, nPartitions:Int) {
   val vectorAssembler = new VectorAssembler()
     .setInputCols(featureCols)
     .setOutputCol("features")
@@ -19,14 +19,14 @@ class LightGbmRunner(data: DataFrame, featureCols: Array[String], targetCol:Stri
 
   val Array(split80, split20) = data.randomSplit(Array(0.8, 0.2), 123)
 
-  val testSet = split20.cache()
-  val trainingSet = split80.cache()
+  val testSet = split20
+  val trainingSet = split80
 
   val trainInput = vectorAssembler.transform(trainingSet).select("features", "fare_amount")
-    .repartition(128)
+    .repartition(nPartitions)
     .cache()
   val testInput = vectorAssembler.transform(testSet).select("features", "fare_amount")
-    .repartition(32)
+    .repartition(8)
     .cache()
 
   val regressorModel = new LightGBMRegressor()
