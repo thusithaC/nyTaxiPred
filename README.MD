@@ -1,9 +1,11 @@
 # how to run the sample code:
 
-First obtain the data from Kagel website
-
+First obtain the data from Kagel website: 
 https://www.kaggle.com/c/new-york-city-taxi-fare-prediction/data
+
 Put the tran.csv and test.csv in the same folder. e.g. /home/user/data/nyTaxyData/
+
+Complie and prepare the jar to be handed over to spark. 
 
 ```code
 sbt compile
@@ -19,6 +21,7 @@ Parmeters to pass:
 2) Sample of the data to use : e.g 0.5
 3) number of partitions before the Lightgbm process starts : e.g. 16
 
+I run into an issue with lightgbm when I have the sameple size set to 0.5 or larger. 
 
 ```code
 $SPARK_HOME/bin/spark-submit \
