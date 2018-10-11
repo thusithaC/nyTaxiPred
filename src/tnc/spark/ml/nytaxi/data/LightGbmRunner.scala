@@ -19,8 +19,8 @@ class LightGbmRunner(data: DataFrame, featureCols: Array[String], targetCol:Stri
 
   val Array(split80, split20) = data.randomSplit(Array(0.8, 0.2), 123)
 
-  val testSet = split20
-  val trainingSet = split80
+  val testSet = split20.cache()
+  val trainingSet = split80.cache()
 
   val trainInput = vectorAssembler.transform(trainingSet).select("features", "fare_amount")
     .repartition(nPartitions)
@@ -38,10 +38,12 @@ class LightGbmRunner(data: DataFrame, featureCols: Array[String], targetCol:Stri
     .setFeaturesCol("features")
     .setNumLeaves(110)
     .setBaggingFraction(1.0)
-    .setBaggingFreq(6)
-    .setMinSumHessianInLeaf(0.0006)
+    .setBaggingFreq(5)
+    //.setMinSumHessianInLeaf(0.0006)
     .setDefaultListenPort(24001)
-    //.setTimeout(1000000)
+    .setMaxBin(128)
+    .setTimeout(100)
+    .setParallelism("voting_parallel")
     .fit(trainInput)
 
   val predictions = regressorModel.transform(testInput)

@@ -9,11 +9,12 @@ sbt assembly
 
 $SPARK_HOME/bin/spark-submit \
   --class tnc.spark.ml.nytaxi.data.processMain \
-  --master local[6] \
+  --master local[8] \
   --driver-memory 42g \
   /home/thusitha/work/spark/nytaxi/target/scala-2.11/NyTaxiFare-assembly-1.0.jar \
   /home/thusitha/work/bigdata/datasets/nytaxi/\
-  0.1
+  0.1\
+  6
 
 
 

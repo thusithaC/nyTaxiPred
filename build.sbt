@@ -26,8 +26,6 @@ scalaSource in Compile := baseDirectory.value / "src"
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "2.3.0",
   "org.apache.spark" %% "spark-sql" % "2.3.0",
-  "ml.dmlc" % "xgboost4j" % "0.80-SNAPSHOT",
-  "ml.dmlc" % "xgboost4j-spark" % "0.80-SNAPSHOT",
   "Azure" % "mmlspark" % "0.14",
 
 

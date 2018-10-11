@@ -1,5 +1,6 @@
 package tnc.spark.ml.nytaxi.data
 
+import org.apache.log4j.{Level, LogManager}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
@@ -103,20 +104,24 @@ class Preprocess(basePath:String, sampleSize:Double)(implicit spark:SparkSession
 
 object processMain extends App {
 
+  val log = LogManager.getRootLogger
+  log.setLevel(Level.INFO)
+
+  log.warn("Command line arguments obtained " + args.mkString(","))
+
+
   val defaultBasePath = "/home/thusitha/work/bigdata/datasets/nytaxi/"
   //val defaultBasePath = "hdfs://vmhost:54310/nytaxi/"
 
-  val defaultSample = 0.1
+  val defaultSample = 0.001
 
   val defaultLgbmPartitions = 16
 
-  if (args.length == 0) {
-    println("Using default parameters for data location and sub-sampling for training")
-  }
+  val dataLoc =  if (args.length > 0) args(0) else defaultBasePath
+  val sampleSize = if (args.length > 1) args(1).toDouble else defaultSample
+  val lgbmPartitions = if (args.length > 2) args(2).toInt else defaultLgbmPartitions
 
-  val dataLoc =  if (args.length == 1) args(0) else defaultBasePath
-  val sampleSize = if (args.length == 2) args(1).toDouble else defaultSample
-  val lgbmPartitions = if (args.length == 3) args(2).toInt else defaultLgbmPartitions
+  log.warn("Obtained params", dataLoc, sampleSize, lgbmPartitions)
 
 
   implicit val spark:SparkSession = SparkSession
@@ -132,8 +137,7 @@ object processMain extends App {
   preprocess.trainDataEngineered.show(100)
 
   val gbRunner = new LightGbmRunner(preprocess.trainDataEngineered, preprocess.trainColumns, preprocess.targetCol, lgbmPartitions)
-  println("testing score " + gbRunner.metric)
-  //println(gbRunner.bestParams)
+  log.warn("Testing score " + gbRunner.metric)
 
 }
 
