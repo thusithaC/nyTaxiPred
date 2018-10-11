@@ -10,14 +10,14 @@ sbt compile
 sbt assembly
 ```
 
-Note the location where the assemblies are copied.
+Note the location where the assemblies are copied. e.g /home/user/scala-2.11/NyTaxiFare-assembly-1.0.jar
 
 To run in local mode , use the following command. Note that you have to pass some parameters as runtime args.
 
 Parmeters to pass:
-1) Data location
-2) Sample of the data to use.
-3) number of partitions before the Lightgbm process starts.
+1) Data location : e.g. /home/user/data/nyTaxyData/
+2) Sample of the data to use : e.g 0.5
+3) number of partitions before the Lightgbm process starts : e.g. 16
 
 
 ```code
