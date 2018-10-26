@@ -127,6 +127,7 @@ object processMain extends App {
   implicit val spark:SparkSession = SparkSession
     .builder()
     .appName("NyTaxiFair")
+    .config("spark.driver.maxResultSize", "12G")
     .getOrCreate()
 
   /*    //.master("local[7]")
